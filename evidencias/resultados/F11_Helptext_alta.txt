@@ -1,0 +1,28 @@
+=== E05 Definición alta ===
+FECHA_REAL: 2026-10-08T16:39:18.9986412-03:00
+EXEC sp_helptext N'dbo.sp_AltaProducto';
+Text
+
+CREATE PROCEDURE dbo.sp_AltaProducto
+ @Nombre NVARCHAR(100), @Stock INT, @Precio DECIMAL(10,2)
+AS
+BEGIN
+ SET NOCOUNT ON;
+ BEGIN TRY
+  IF @Nombre IS NULL OR LEN(LTRIM(RTRIM(@Nombre)))=0
+   THROW 50001, 'El nombre no puede estar vacío.', 1;
+  IF @Stock IS 
+NULL OR @Stock < 0 THROW 50002, 'El stock debe ser no negativo.', 1;
+  IF @Precio IS NULL OR @Precio < 0 THROW 50003, 'El precio debe ser no negativo.', 1;
+  INSERT dbo.Productos(Nombre,Stock,Precio) VALUES(@Nombre,@Stock,@Precio);
+  PRINT 'Producto inser
+tado correctamente.';
+ END TRY
+ BEGIN CATCH
+  PRINT 'Error al insertar el producto: ' + ERROR_MESSAGE();
+  THROW;
+ END CATCH
+END;
+
+FILAS: 3
+

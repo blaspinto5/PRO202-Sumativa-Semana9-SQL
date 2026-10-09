@@ -1,0 +1,27 @@
+=== E01 Después alta ===
+FECHA_REAL: 2026-10-08T16:39:18.9585292-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+1 | Teclado de prueba | 10 | 19990.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+FILAS: 1
+
+
+=== E02 Baja ID existente ===
+FECHA_REAL: 2026-10-08T16:39:18.9631713-03:00
+DECLARE @Id INT=(SELECT MIN(IdProducto) FROM dbo.Productos); EXEC dbo.sp_BajaProducto @Id;
+MENSAJE: Producto eliminado correctamente.
+
+
+=== E02 Después baja ===
+FECHA_REAL: 2026-10-08T16:39:18.9681036-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+FILAS: 2
+

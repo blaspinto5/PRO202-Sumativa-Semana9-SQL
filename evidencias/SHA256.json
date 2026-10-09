@@ -1,0 +1,406 @@
+[
+  {
+    "archivo": ".gitignore",
+    "sha256": "031161097eb07ea6922b122d08e81f8ea7169637655cc212cac11e5ce6ad1789"
+  },
+  {
+    "archivo": "evidencias/capturas/F01_Entorno_SQL_Server_P01.jpg",
+    "sha256": "5fbe469a127f2db622e2864b18625755426ec3a57fc29da5c9f7787032ed9bea"
+  },
+  {
+    "archivo": "evidencias/capturas/F02_Creacion_tablas_P01.jpg",
+    "sha256": "a60bffe4761a41116d75096c8c53ff93064e4122f654990b81e269207bdc0100"
+  },
+  {
+    "archivo": "evidencias/capturas/F03_Procedimiento_alta_P01.jpg",
+    "sha256": "d53e5a1cd9bc51cb3a2849c5bd81110fa88518a9f2425af26e7711a3b4094006"
+  },
+  {
+    "archivo": "evidencias/capturas/F04_Procedimiento_baja_P01.jpg",
+    "sha256": "be561118cc84f33b05c694bb4103ea050e48bb1148b5c1319366782b22ea9741"
+  },
+  {
+    "archivo": "evidencias/capturas/F05_Triggers_definiciones_P01.jpg",
+    "sha256": "374973ce61a95d9b13c1d7baaf1dae32bd6fabef95575ced293ec0a452b2c273"
+  },
+  {
+    "archivo": "evidencias/capturas/F05_Triggers_definiciones_P02.jpg",
+    "sha256": "b49f522e8d58ce8658b629403670f349712f188a840947a5b4292fd22f02c11b"
+  },
+  {
+    "archivo": "evidencias/capturas/F05_Triggers_definiciones_P03.jpg",
+    "sha256": "341ad9cb618e8fcca144fc2e4ceab1a52229b144f5192b3639e9374866c41bd4"
+  },
+  {
+    "archivo": "evidencias/capturas/F06_Cursor_definicion_P01.jpg",
+    "sha256": "b7372c3712af039fc9b3452a4f1af45ddf20bccddfb53aa0b5b7230cb0502245"
+  },
+  {
+    "archivo": "evidencias/capturas/F06_Cursor_definicion_P02.jpg",
+    "sha256": "2337a99773d27fd4711da79953776bd6804cac9351601ddb54b7189c9878ac87"
+  },
+  {
+    "archivo": "evidencias/capturas/F07_Alta_antes_ejecucion_despues.jpg",
+    "sha256": "4c07be2adee1ce2cf82e3fffe465a32d0ff23f85591d7422e56f68cd12f18b39"
+  },
+  {
+    "archivo": "evidencias/capturas/F07_Alta_antes_ejecucion_despues_P01.jpg",
+    "sha256": "b66c5a9586b200a9dc7605fec7ed5af9da251b8f9c2e066abed0f368d3d062b7"
+  },
+  {
+    "archivo": "evidencias/capturas/F08_Baja_antes_ejecucion_despues_P01.jpg",
+    "sha256": "fed3cd36d592c7b4a1d89dd6ef2f427677b17f3887ee27e90ce5ab49b2f21d67"
+  },
+  {
+    "archivo": "evidencias/capturas/F09_Baja_ID_inexistente_P01.jpg",
+    "sha256": "56ecc581a23b8788d364dec866aecc827a091534ddec94cc9f7cf0c8e065fb58"
+  },
+  {
+    "archivo": "evidencias/capturas/F10_Triggers_registrados_P01.jpg",
+    "sha256": "975e7c29464ffbeb82e40f680bac38e073bd0055d09018f973908bdda1956068"
+  },
+  {
+    "archivo": "evidencias/capturas/F11_Helptext_alta_P01.jpg",
+    "sha256": "b11d88753f69097ce2b1cfd032e5290efddb448e2a0508e92ad2e946e200cae5"
+  },
+  {
+    "archivo": "evidencias/capturas/F11_Helptext_alta_P02.jpg",
+    "sha256": "3f411448484fdc77ea50e23b5e794c6592c7b4bf81d752319d67d1f0a7c8888b"
+  },
+  {
+    "archivo": "evidencias/capturas/F12_Helptext_baja_P01.jpg",
+    "sha256": "84a365ba0447df7cd9714b20394b5acef9d8e2ed297fb77e95269acc52e4c509"
+  },
+  {
+    "archivo": "evidencias/capturas/F13_Excepciones_alta_y_baja_P01.jpg",
+    "sha256": "5b21e94e235eb875b215afe6ad2c30341ff363d163ec4acfde8ee1da199803f9"
+  },
+  {
+    "archivo": "evidencias/capturas/F13_Excepciones_alta_y_baja_P02.jpg",
+    "sha256": "bf0db162fea3d9eeddab5d3152815c0ba130863d9539cbb23846e992d29d39df"
+  },
+  {
+    "archivo": "evidencias/capturas/F14_Insercion_multiple_P01.jpg",
+    "sha256": "c5f2abb31e31e7969fdcd227e0e744d215256594238c8f598de5b8e2164bfd8b"
+  },
+  {
+    "archivo": "evidencias/capturas/F15_Cursor_con_productos_P01.jpg",
+    "sha256": "430841aae506c648d2699db5603eaf177b7e933400efcb437af9a31287862d83"
+  },
+  {
+    "archivo": "evidencias/capturas/F16_Actualizacion_valida_P01.jpg",
+    "sha256": "6eadb9e5e852983c63b238ee0ccd2cfb759cbac2914342d05405549a031c294c"
+  },
+  {
+    "archivo": "evidencias/capturas/F16_Actualizacion_valida_P02.jpg",
+    "sha256": "179c496b92b7d6a1abe1e616ad4df1ccdb1c43417de9b91ace5a8bf843ec8d68"
+  },
+  {
+    "archivo": "evidencias/capturas/F17_Actualizacion_sin_cambios_P01.jpg",
+    "sha256": "ade8d4baec0121a1fad9d470b45c52bab564b3826e301b8ebcd8b2c91f916029"
+  },
+  {
+    "archivo": "evidencias/capturas/F17_Actualizacion_sin_cambios_P02.jpg",
+    "sha256": "8e89c58a2672e4aeac09bd019859f84a42de1437d39a8e6c05b7aeb5c85e6b70"
+  },
+  {
+    "archivo": "evidencias/capturas/F18_Actualizacion_invalida_P01.jpg",
+    "sha256": "d0cfb929b8421c01e55cb950d0c841d6c98711439dfede995ce275acb4d79e07"
+  },
+  {
+    "archivo": "evidencias/capturas/F18_Actualizacion_invalida_P02.jpg",
+    "sha256": "159b67bcae3bccd70ae71ef307ab234ba97302f598c141470ca8c7da8193a969"
+  },
+  {
+    "archivo": "evidencias/capturas/F19_Eliminacion_multiple_P01.jpg",
+    "sha256": "18c548be78c135a7b7b9304623101f4a2d1efddaa585917187dd440ca2c51bef"
+  },
+  {
+    "archivo": "evidencias/capturas/F19_Eliminacion_multiple_P02.jpg",
+    "sha256": "ba2cec922a9936eceeb107add7f960c18a9e15cd525ce4ee9a5c6e961b626840"
+  },
+  {
+    "archivo": "evidencias/capturas/F20_Cursor_sin_productos_P01.jpg",
+    "sha256": "080f5cbf6bda399f1f092db3b8abb633dd9336d5eb02965a3bb49d694c642d4a"
+  },
+  {
+    "archivo": "evidencias/capturas/F21_Validacion_Nombre_nulo_P01.jpg",
+    "sha256": "85be523a298448accf1ca9b5142e37246db64c0602fe239cdb92ac388a4814f6"
+  },
+  {
+    "archivo": "evidencias/capturas/F21_Validacion_Nombre_nulo_P02.jpg",
+    "sha256": "63b861778bdbcaba276e0ddb9a489e0e08e24a71ea8ab2a37822bec02389aec5"
+  },
+  {
+    "archivo": "evidencias/capturas/F22_Validacion_Nombre_vac_o_P01.jpg",
+    "sha256": "8e70b12d7388e1f97c83facfd77689af1e72b0f4452d64eae96bcc858d416ccb"
+  },
+  {
+    "archivo": "evidencias/capturas/F22_Validacion_Nombre_vac_o_P02.jpg",
+    "sha256": "698ab6def90aea716e9cb396f604ac71eb0000125766f91f7c8aecc482f0bc74"
+  },
+  {
+    "archivo": "evidencias/capturas/F23_Validacion_Nombre_solo_espacios_P01.jpg",
+    "sha256": "f06059725b97b57bbc2db1383d8d5279a438036a76a817f41069b34385926e83"
+  },
+  {
+    "archivo": "evidencias/capturas/F23_Validacion_Nombre_solo_espacios_P02.jpg",
+    "sha256": "fcee7b6f7a987aeafc8d0a4f012751701360c6f9d300983c4c444a4a3cff5ae4"
+  },
+  {
+    "archivo": "evidencias/capturas/F24_Validacion_Stock_nulo_P01.jpg",
+    "sha256": "80ddf1a164c047a80e16ce35c8b7ab8e117ff3ae67fe06669e99bbac1e7bcbbd"
+  },
+  {
+    "archivo": "evidencias/capturas/F24_Validacion_Stock_nulo_P02.jpg",
+    "sha256": "5fc7d129481b98af1af5f802181a65af371646a2a9333329b2fa085e63da9476"
+  },
+  {
+    "archivo": "evidencias/capturas/F25_Validacion_Precio_nulo_P01.jpg",
+    "sha256": "9805a78d412e01703e0c5d6a8ba94c7f2fdd148873963d9364c1e6f71570f501"
+  },
+  {
+    "archivo": "evidencias/capturas/F25_Validacion_Precio_nulo_P02.jpg",
+    "sha256": "f4c1c2c7e770be97bacc2cebc40a2705156aaab3d5f140bed0fc6f72d7b762a1"
+  },
+  {
+    "archivo": "evidencias/capturas/F26_Validacion_Precio_negativo_P01.jpg",
+    "sha256": "896136e0a4ad6fc61f90d029c2c86d1988ecb9378664a1497149ffb9b4bad702"
+  },
+  {
+    "archivo": "evidencias/capturas/F26_Validacion_Precio_negativo_P02.jpg",
+    "sha256": "b0a3f0f54a4467a42e9d572974dcf149a57fce270b7cbc4947147bb6338de1b7"
+  },
+  {
+    "archivo": "evidencias/capturas/F27_Validacion_ID_nulo_P01.jpg",
+    "sha256": "bcc2b494cb7c80c1e71a2dc25132f0ab123a0750902a79de37bcabe49499fa97"
+  },
+  {
+    "archivo": "evidencias/capturas/F27_Validacion_ID_nulo_P02.jpg",
+    "sha256": "87b2dd504d25c2b00cca42f5023712ad89481cfa4015994d03a1fa1a73a9e07b"
+  },
+  {
+    "archivo": "evidencias/capturas/F28_Validacion_ID_cero_P01.jpg",
+    "sha256": "a29e480f5653082816c2be230a4e90bb50b95cf924af6720e7d4e5f16f2d0c36"
+  },
+  {
+    "archivo": "evidencias/capturas/F28_Validacion_ID_cero_P02.jpg",
+    "sha256": "523cebfeebb72f506f0ef61c5380934a7ede509fae577ec8b07db3960cee1c8f"
+  },
+  {
+    "archivo": "evidencias/capturas/F29_Limites_validos_y_rollback_P01.jpg",
+    "sha256": "78a0a0f04ac57bfeee1b5a9c86141478c4a0fad14b317a3086cadd20ab207370"
+  },
+  {
+    "archivo": "evidencias/capturas/F30_UPDATE_Nombre_nulo_P01.jpg",
+    "sha256": "db511d3590a3f102995a1aca1bceffa31bbe221a0f4904a7ee0d1adbfb48fcf9"
+  },
+  {
+    "archivo": "evidencias/capturas/F30_UPDATE_Nombre_nulo_P02.jpg",
+    "sha256": "b328a121d3644d34314add0411c9e34e3b758d22075938be7a1a15b4888bb67d"
+  },
+  {
+    "archivo": "evidencias/capturas/F31_UPDATE_Nombre_vac_o_P01.jpg",
+    "sha256": "a6b8986b2196ed48f241548cfcbc4fb5d0590f67c45903e7af3f57f46ed4550e"
+  },
+  {
+    "archivo": "evidencias/capturas/F31_UPDATE_Nombre_vac_o_P02.jpg",
+    "sha256": "929d2783b4cb18f4e8a95ad6df0c15cf54bd31d7f0163cb499a19f22623754f3"
+  },
+  {
+    "archivo": "evidencias/capturas/F32_UPDATE_Stock_nulo_P01.jpg",
+    "sha256": "43a898d9989ec08a7ef35f3189c60d4b844caa6f9f187bf31de191901a9d36b5"
+  },
+  {
+    "archivo": "evidencias/capturas/F32_UPDATE_Stock_nulo_P02.jpg",
+    "sha256": "827fb99968f9dda961a9169e13344a8ccf6260606d204d231403428a1345b3b8"
+  },
+  {
+    "archivo": "evidencias/capturas/F33_UPDATE_Precio_nulo_P01.jpg",
+    "sha256": "4c5a45c7a26c24ed5144f9dc52486d46e9fa28a5649a0978a29f30484ef4ccaa"
+  },
+  {
+    "archivo": "evidencias/capturas/F33_UPDATE_Precio_nulo_P02.jpg",
+    "sha256": "1fe14652fc0d844a23c23536a8a0ce77c02049e3c292bdd49859dc799a49825a"
+  },
+  {
+    "archivo": "evidencias/capturas/F34_UPDATE_Precio_negativo_P01.jpg",
+    "sha256": "be92b038d133b33a92a7e8901be421fc30f4d7994dd13799e3706e344ba92007"
+  },
+  {
+    "archivo": "evidencias/capturas/F34_UPDATE_Precio_negativo_P02.jpg",
+    "sha256": "2beda55e5aabaea3af08680444be5018f7dbe4e3f3877b7988e299eb3bc6bb0f"
+  },
+  {
+    "archivo": "evidencias/capturas/F35_Comprobacion_final_P01.jpg",
+    "sha256": "a5e5f5a08876499cc4c58e271fc750808ed78b88d3f8fb12fe4bcbccdc807e71"
+  },
+  {
+    "archivo": "evidencias/README.md",
+    "sha256": "2ce0e684daa4b8ef6555aae9a93e097471435caaca048a26f03e0164e1e06b33"
+  },
+  {
+    "archivo": "evidencias/resultados/F01_Entorno_SQL_Server.txt",
+    "sha256": "de7765998d1830661b4004ff12e62d3d890b1cd7423435ba00d89d0ecf03ddd5"
+  },
+  {
+    "archivo": "evidencias/resultados/F02_Creacion_tablas.txt",
+    "sha256": "e645d2d0f5958ae962eb44b8705e16c48b05c123b34a8a35bc8fedfc9f18dcbb"
+  },
+  {
+    "archivo": "evidencias/resultados/F03_Procedimiento_alta.txt",
+    "sha256": "1afda4bc6962db8eefeba176e8c5441b410a6a5433d83daff417fc95965eb234"
+  },
+  {
+    "archivo": "evidencias/resultados/F04_Procedimiento_baja.txt",
+    "sha256": "13c540f467b3b4cb1a8b64c5f08b827999a95e9e34b11c876818d201d5e2f1e6"
+  },
+  {
+    "archivo": "evidencias/resultados/F05_Triggers_definiciones.txt",
+    "sha256": "19a2118d1e9209f7b8e565fd6fc0908b62d5456e468f036b5755535a11334fc2"
+  },
+  {
+    "archivo": "evidencias/resultados/F06_Cursor_definicion.txt",
+    "sha256": "6ebe0b1b381afdd1a9e10468e7cfb9f4f5af197cbdf35dcd01b30017ceb17e12"
+  },
+  {
+    "archivo": "evidencias/resultados/F07_Alta_antes_ejecucion_despues.txt",
+    "sha256": "a1216fa25d511da494eaf65eff8289204e28253e54c94d0eb7cfbdecbf99bdf2"
+  },
+  {
+    "archivo": "evidencias/resultados/F08_Baja_antes_ejecucion_despues.txt",
+    "sha256": "c5e7fd618f71713e4dd5027ae6cb88a104b69656b152950360cea638c3a4e73e"
+  },
+  {
+    "archivo": "evidencias/resultados/F09_Baja_ID_inexistente.txt",
+    "sha256": "9956d9e08a30557f3d0f8d4fa5d2763fded5aebb044607a1eb5438e335474436"
+  },
+  {
+    "archivo": "evidencias/resultados/F10_Triggers_registrados.txt",
+    "sha256": "102e36ad7d45a9b2eb780950b4055cab93dcbbb6ecc6c6e7091a71219e18f364"
+  },
+  {
+    "archivo": "evidencias/resultados/F11_Helptext_alta.txt",
+    "sha256": "ebe7e978c0d048225b5a298959b79375076e7db8dd7a957fef79ab2a21c4ad63"
+  },
+  {
+    "archivo": "evidencias/resultados/F12_Helptext_baja.txt",
+    "sha256": "7372f6a825a7b338c0ac4fc5003f12a000210cf7628751b2f838f775db06c589"
+  },
+  {
+    "archivo": "evidencias/resultados/F13_Excepciones_alta_y_baja.txt",
+    "sha256": "5878f6816c8957356f8377f6c599d5d73ff745cc862acc4bfbae4c485e87a57a"
+  },
+  {
+    "archivo": "evidencias/resultados/F14_Insercion_multiple.txt",
+    "sha256": "644da1701357ca8a28907002983ab3b97107109ca6132f03dd4852ec70067e9e"
+  },
+  {
+    "archivo": "evidencias/resultados/F15_Cursor_con_productos.txt",
+    "sha256": "c72c777798ab2e3bdcf0db1f9346fd20aba33d03dc3b8f3bb510188264043ee1"
+  },
+  {
+    "archivo": "evidencias/resultados/F16_Actualizacion_valida.txt",
+    "sha256": "394feff27190dc2fda59d5374631c97d8badc304949bd26f8db6bb793fa38084"
+  },
+  {
+    "archivo": "evidencias/resultados/F17_Actualizacion_sin_cambios.txt",
+    "sha256": "b952a53efaaa3c98e0c26667e8b4ef51508122006732a07d71dca5562b5d55f6"
+  },
+  {
+    "archivo": "evidencias/resultados/F18_Actualizacion_invalida.txt",
+    "sha256": "9d81d48e3d5998ae680f94572c3bfc68296d39bae68500f20835b83232c0f223"
+  },
+  {
+    "archivo": "evidencias/resultados/F19_Eliminacion_multiple.txt",
+    "sha256": "319546d012fecfd4ac841e258131726e3cb54de8150667268e4688297cf57229"
+  },
+  {
+    "archivo": "evidencias/resultados/F20_Cursor_sin_productos.txt",
+    "sha256": "5027cc861cb7e12bc1924232f4116b4874198e53106e1a2b8bec5acf1f5dcd4d"
+  },
+  {
+    "archivo": "evidencias/resultados/F21_Validacion_Nombre_nulo.txt",
+    "sha256": "82993b9e3537c6938be07a9990d90525b9dea3fe60eb564dcec386956501be90"
+  },
+  {
+    "archivo": "evidencias/resultados/F22_Validacion_Nombre_vac_o.txt",
+    "sha256": "f23dafc3bc4f3a1b1ed9c1a7eda9dfcc972b98f9adaccc523886fd05edf9c3f9"
+  },
+  {
+    "archivo": "evidencias/resultados/F23_Validacion_Nombre_solo_espacios.txt",
+    "sha256": "63bb5ff91c5aad5da42e320968335a9a0e9be95901640aed7f221362b218cd9a"
+  },
+  {
+    "archivo": "evidencias/resultados/F24_Validacion_Stock_nulo.txt",
+    "sha256": "dd238f43e8fef23db0ca94412bcb8ef9b6ce4d31427864038274bb76dbb223dd"
+  },
+  {
+    "archivo": "evidencias/resultados/F25_Validacion_Precio_nulo.txt",
+    "sha256": "738fd991350330eace84f3ca20b1729ea0e48533b985d42a840cb1076fc4b803"
+  },
+  {
+    "archivo": "evidencias/resultados/F26_Validacion_Precio_negativo.txt",
+    "sha256": "d31023c5c92760586e6962087c9d5f39b007fe07ce6da6ad1df20e661483c0db"
+  },
+  {
+    "archivo": "evidencias/resultados/F27_Validacion_ID_nulo.txt",
+    "sha256": "f6f930ed8a5e67e4dd3d053526edbe8cadc72e93fb652c9982af3bd254d9074b"
+  },
+  {
+    "archivo": "evidencias/resultados/F28_Validacion_ID_cero.txt",
+    "sha256": "8857e4752a856f27458bddb9029b5e92987248c27e21dbea21db6aec9f6d70b6"
+  },
+  {
+    "archivo": "evidencias/resultados/F29_Limites_validos_y_rollback.txt",
+    "sha256": "97aa1a09cd18fc1a6d1ebbd4153198fdbf145a8a122d9c7ca4b6f61f30c83e78"
+  },
+  {
+    "archivo": "evidencias/resultados/F30_UPDATE_Nombre_nulo.txt",
+    "sha256": "601a96309877acc35916285eb27a0d6158939f98e98a819edbc1f042ad0e041b"
+  },
+  {
+    "archivo": "evidencias/resultados/F31_UPDATE_Nombre_vac_o.txt",
+    "sha256": "be57ae462c1cbc5d51e6a2c78e800a5ce97b0844984beda3825a592860268d89"
+  },
+  {
+    "archivo": "evidencias/resultados/F32_UPDATE_Stock_nulo.txt",
+    "sha256": "ab0f7f909c1df56ad83a780318e9d59de10d269f910b8f9b212393dd13a5f551"
+  },
+  {
+    "archivo": "evidencias/resultados/F33_UPDATE_Precio_nulo.txt",
+    "sha256": "8afa8b3654f08d11a4b87cbaf8e8ca2562a9a605d1d44bdcb57fbb05e1174143"
+  },
+  {
+    "archivo": "evidencias/resultados/F34_UPDATE_Precio_negativo.txt",
+    "sha256": "0d429b2db202cd07757f700f5083df12316abb0fc75c300d55f3e9ab19850efb"
+  },
+  {
+    "archivo": "evidencias/resultados/F35_Comprobacion_final.txt",
+    "sha256": "cc26824de91b38d1f9014ae7fba0db076952fa63ed2e52928dec953b299c26ad"
+  },
+  {
+    "archivo": "evidencias/resultados/Registro_completo.txt",
+    "sha256": "4834e58725fd7799cbd679fe6bba91b781516eaf1c75b0a0206e1442b6e8fe7d"
+  },
+  {
+    "archivo": "informe/Informe_Blas_Pinto_Semana_9.docx",
+    "sha256": "4ddf8373b1f58ef8f98931f4ccdeed6c437fdc93fbbaed7dff6dbccee4d8b0c4"
+  },
+  {
+    "archivo": "informe/Informe_Blas_Pinto_Semana_9.pdf",
+    "sha256": "157ca106d1b5e6a65f40bf1c8bf11f7634c2f9dcaa0a7dbe051d1e966b31cc61"
+  },
+  {
+    "archivo": "README.md",
+    "sha256": "a6fb69d789c752f665d287907f16912ddd3922e7d0633792bf3b6b8eeb265917"
+  },
+  {
+    "archivo": "sql/01_Implementacion.sql",
+    "sha256": "80f6d964e4ed5f30e15f2fc724717f5bc5bb5d96c88fc646bf01ebf039fd32d1"
+  },
+  {
+    "archivo": "sql/02_Ampliacion_rubrica.sql",
+    "sha256": "6da509159d931735c2e61e24036c8064e5732d3e617df03791bae2e3e99991f8"
+  }
+]

@@ -1,0 +1,26 @@
+=== E14 Limpieza de producto de prueba ===
+FECHA_REAL: 2026-10-08T16:39:19.1890322-03:00
+DELETE dbo.Productos; SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+11 | 5 | DEL | 10/08/2026 16:39:19
+FILAS: 10
+
+
+=== Comprobación final automática ===
+FECHA_REAL: 2026-10-08T16:39:19.1903674-03:00
+IF (SELECT COUNT(*) FROM dbo.Productos)<>0 THROW 50100,'Productos final inesperado',1; IF (SELECT COUNT(*) FROM dbo.AuditoriaInventario WHERE Accion='INS')<>4 THROW 50101,'INS inesperado',1; IF (SELECT COUNT(*) FROM dbo.AuditoriaInventario WHERE Accion='DEL')<>4 THROW 50102,'DEL inesperado',1; IF (SELECT COUNT(*) FROM dbo.AuditoriaInventario WHERE Accion='UPD')<>2 THROW 50103,'UPD inesperado',1; SELECT 'Verificaciones superadas' AS Resultado;
+Resultado
+Verificaciones superadas
+FILAS: 1
+

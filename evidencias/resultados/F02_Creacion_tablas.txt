@@ -1,0 +1,18 @@
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9330442-03:00
+-- Actividad semana 9. Ejecutar en una base exclusiva de pruebas.
+-- Las validaciones son decisiones de diseño, no reglas textuales del PDF.
+CREATE TABLE dbo.Productos (
+ IdProducto INT PRIMARY KEY IDENTITY,
+ Nombre NVARCHAR(100), Stock INT, Precio DECIMAL(10,2),
+ CONSTRAINT CK_Productos_Nombre CHECK (Nombre IS NOT NULL AND LEN(LTRIM(RTRIM(Nombre))) > 0),
+ CONSTRAINT CK_Productos_Stock CHECK (Stock IS NOT NULL AND Stock >= 0),
+ CONSTRAINT CK_Productos_Precio CHECK (Precio IS NOT NULL AND Precio >= 0)
+);
+CREATE TABLE dbo.AuditoriaInventario (
+ IdAuditoria INT PRIMARY KEY IDENTITY,
+ IdProducto INT, Accion NVARCHAR(10), Fecha DATETIME DEFAULT GETDATE()
+);
+-- Sin FK a Productos: la auditoría debe conservar las bajas.
+
+

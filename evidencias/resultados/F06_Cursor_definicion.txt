@@ -1,0 +1,30 @@
+=== Creación 02_Ampliacion_rubrica.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9452109-03:00
+
+CREATE PROCEDURE dbo.sp_ConsultarInventarioCursor
+AS
+BEGIN
+ SET NOCOUNT ON;
+ DECLARE @Id INT,@Nombre NVARCHAR(100),@Stock INT;
+ -- Demostración académica de recorrido. Para listar inventario se prefiere SELECT.
+ DECLARE inventario CURSOR LOCAL FAST_FORWARD FOR
+ SELECT IdProducto,Nombre,Stock FROM dbo.Productos ORDER BY IdProducto;
+ BEGIN TRY
+  OPEN inventario;
+  FETCH NEXT FROM inventario INTO @Id,@Nombre,@Stock;
+  WHILE @@FETCH_STATUS=0
+  BEGIN
+   PRINT CONCAT('ID=',@Id,'; Nombre=',@Nombre,'; Stock=',@Stock);
+   FETCH NEXT FROM inventario INTO @Id,@Nombre,@Stock;
+  END;
+  CLOSE inventario;
+  DEALLOCATE inventario;
+ END TRY
+ BEGIN CATCH
+  IF CURSOR_STATUS('local','inventario')>=0 CLOSE inventario;
+  IF CURSOR_STATUS('local','inventario')>=-1 DEALLOCATE inventario;
+  THROW;
+ END CATCH
+END;
+
+

@@ -1,0 +1,57 @@
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9383577-03:00
+
+CREATE TRIGGER dbo.trg_Auditoria_AltaProducto ON dbo.Productos AFTER INSERT
+AS
+BEGIN
+ SET NOCOUNT ON;
+ INSERT dbo.AuditoriaInventario(IdProducto,Accion)
+ SELECT IdProducto,'INS' FROM inserted;
+END;
+
+
+
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9395897-03:00
+
+CREATE TRIGGER dbo.trg_Auditoria_BajaProducto ON dbo.Productos AFTER DELETE
+AS
+BEGIN
+ SET NOCOUNT ON;
+ INSERT dbo.AuditoriaInventario(IdProducto,Accion)
+ SELECT IdProducto,'DEL' FROM deleted;
+END;
+
+
+
+=== Creación 02_Ampliacion_rubrica.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9427989-03:00
+-- Ampliación propuesta para cubrir menciones de la rúbrica.
+-- INSTEAD OF reemplaza la operación; no es un trigger BEFORE.
+CREATE TRIGGER dbo.trg_Validar_Actualizacion ON dbo.Productos INSTEAD OF UPDATE
+AS
+BEGIN
+ SET NOCOUNT ON;
+ IF EXISTS(SELECT 1 FROM inserted WHERE Nombre IS NULL OR LEN(LTRIM(RTRIM(Nombre)))=0
+  OR Stock IS NULL OR Stock<0 OR Precio IS NULL OR Precio<0)
+  THROW 50005, 'Actualización rechazada: nombre, stock o precio inválidos.', 1;
+ UPDATE p SET Nombre=i.Nombre, Stock=i.Stock, Precio=i.Precio
+ FROM dbo.Productos p JOIN inserted i ON p.IdProducto=i.IdProducto;
+END;
+
+
+
+=== Creación 02_Ampliacion_rubrica.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9441649-03:00
+
+CREATE TRIGGER dbo.trg_Auditoria_ActualizarProducto ON dbo.Productos AFTER UPDATE
+AS
+BEGIN
+ SET NOCOUNT ON;
+ -- Condicional: no registrar una actualización sin cambios efectivos.
+ INSERT dbo.AuditoriaInventario(IdProducto,Accion)
+ SELECT i.IdProducto,'UPD' FROM inserted i JOIN deleted d ON i.IdProducto=d.IdProducto
+ WHERE i.Nombre<>d.Nombre OR i.Stock<>d.Stock OR i.Precio<>d.Precio;
+END;
+
+

@@ -1,0 +1,10 @@
+=== E04 Triggers ===
+FECHA_REAL: 2026-10-08T16:39:18.9720104-03:00
+EXEC sp_helptrigger N'dbo.Productos';
+trigger_name | trigger_owner | isupdate | isdelete | isinsert | isafter | isinsteadof | trigger_schema
+trg_Auditoria_AltaProducto | dbo | 0 | 0 | 1 | 1 | 0 | dbo
+trg_Auditoria_BajaProducto | dbo | 0 | 1 | 0 | 1 | 0 | dbo
+trg_Validar_Actualizacion | dbo | 1 | 0 | 0 | 0 | 1 | dbo
+trg_Auditoria_ActualizarProducto | dbo | 1 | 0 | 0 | 1 | 0 | dbo
+FILAS: 4
+

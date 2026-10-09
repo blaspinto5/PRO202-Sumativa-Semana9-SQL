@@ -1,0 +1,41 @@
+=== E12 Precio nulo: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1595800-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+
+=== E12 Precio nulo: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1605596-03:00
+EXEC dbo.sp_AltaProducto N'Prueba',1,NULL;
+MENSAJE: Error al insertar el producto: El precio debe ser no negativo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El precio debe ser no negativo."
+NUMERO_ERROR_SQL: 50003
+
+
+=== E12 Precio nulo: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1613072-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+

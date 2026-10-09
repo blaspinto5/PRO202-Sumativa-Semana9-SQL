@@ -1,0 +1,22 @@
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9405057-03:00
+
+CREATE PROCEDURE dbo.sp_BajaProducto @IdProducto INT
+AS
+BEGIN
+ SET NOCOUNT ON;
+ BEGIN TRY
+  IF @IdProducto IS NULL OR @IdProducto <= 0
+   THROW 50004, 'El identificador debe ser positivo.', 1;
+  -- DELETE y @@ROWCOUNT evitan separar la comprobación de la operación.
+  DELETE dbo.Productos WHERE IdProducto=@IdProducto;
+  IF @@ROWCOUNT=0 PRINT 'Producto no existe.';
+  ELSE PRINT 'Producto eliminado correctamente.';
+ END TRY
+ BEGIN CATCH
+  PRINT 'Error al eliminar el producto: ' + ERROR_MESSAGE();
+  THROW;
+ END CATCH
+END;
+
+

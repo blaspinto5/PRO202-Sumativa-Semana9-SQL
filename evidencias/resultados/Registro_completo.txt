@@ -1,0 +1,894 @@
+
+=== Entorno y fecha real de ejecución ===
+FECHA_REAL: 2026-10-08T16:39:18.8943624-03:00
+SELECT @@VERSION AS Version, DB_NAME() AS Base, SYSDATETIMEOFFSET() AS Fecha;
+Version | Base | Fecha
+Microsoft SQL Server 2022 (RTM) - 16.0.1000.6 (X64) 
+	Oct  8 2022 05:58:25 
+	Copyright (C) 2022 Microsoft Corporation
+	Express Edition (64-bit) on Windows 10 Pro 10.0 <X64> (Build 26200: ) (Hypervisor)
+ | PRO202_Evidencias_20261008_163918 | 10/08/2026 16:39:18 -03:00
+FILAS: 1
+
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9330442-03:00
+-- Actividad semana 9. Ejecutar en una base exclusiva de pruebas.
+-- Las validaciones son decisiones de diseño, no reglas textuales del PDF.
+CREATE TABLE dbo.Productos (
+ IdProducto INT PRIMARY KEY IDENTITY,
+ Nombre NVARCHAR(100), Stock INT, Precio DECIMAL(10,2),
+ CONSTRAINT CK_Productos_Nombre CHECK (Nombre IS NOT NULL AND LEN(LTRIM(RTRIM(Nombre))) > 0),
+ CONSTRAINT CK_Productos_Stock CHECK (Stock IS NOT NULL AND Stock >= 0),
+ CONSTRAINT CK_Productos_Precio CHECK (Precio IS NOT NULL AND Precio >= 0)
+);
+CREATE TABLE dbo.AuditoriaInventario (
+ IdAuditoria INT PRIMARY KEY IDENTITY,
+ IdProducto INT, Accion NVARCHAR(10), Fecha DATETIME DEFAULT GETDATE()
+);
+-- Sin FK a Productos: la auditoría debe conservar las bajas.
+
+
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9365334-03:00
+
+CREATE PROCEDURE dbo.sp_AltaProducto
+ @Nombre NVARCHAR(100), @Stock INT, @Precio DECIMAL(10,2)
+AS
+BEGIN
+ SET NOCOUNT ON;
+ BEGIN TRY
+  IF @Nombre IS NULL OR LEN(LTRIM(RTRIM(@Nombre)))=0
+   THROW 50001, 'El nombre no puede estar vacío.', 1;
+  IF @Stock IS NULL OR @Stock < 0 THROW 50002, 'El stock debe ser no negativo.', 1;
+  IF @Precio IS NULL OR @Precio < 0 THROW 50003, 'El precio debe ser no negativo.', 1;
+  INSERT dbo.Productos(Nombre,Stock,Precio) VALUES(@Nombre,@Stock,@Precio);
+  PRINT 'Producto insertado correctamente.';
+ END TRY
+ BEGIN CATCH
+  PRINT 'Error al insertar el producto: ' + ERROR_MESSAGE();
+  THROW;
+ END CATCH
+END;
+
+
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9383577-03:00
+
+CREATE TRIGGER dbo.trg_Auditoria_AltaProducto ON dbo.Productos AFTER INSERT
+AS
+BEGIN
+ SET NOCOUNT ON;
+ INSERT dbo.AuditoriaInventario(IdProducto,Accion)
+ SELECT IdProducto,'INS' FROM inserted;
+END;
+
+
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9395897-03:00
+
+CREATE TRIGGER dbo.trg_Auditoria_BajaProducto ON dbo.Productos AFTER DELETE
+AS
+BEGIN
+ SET NOCOUNT ON;
+ INSERT dbo.AuditoriaInventario(IdProducto,Accion)
+ SELECT IdProducto,'DEL' FROM deleted;
+END;
+
+
+=== Creación 01_Implementacion.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9405057-03:00
+
+CREATE PROCEDURE dbo.sp_BajaProducto @IdProducto INT
+AS
+BEGIN
+ SET NOCOUNT ON;
+ BEGIN TRY
+  IF @IdProducto IS NULL OR @IdProducto <= 0
+   THROW 50004, 'El identificador debe ser positivo.', 1;
+  -- DELETE y @@ROWCOUNT evitan separar la comprobación de la operación.
+  DELETE dbo.Productos WHERE IdProducto=@IdProducto;
+  IF @@ROWCOUNT=0 PRINT 'Producto no existe.';
+  ELSE PRINT 'Producto eliminado correctamente.';
+ END TRY
+ BEGIN CATCH
+  PRINT 'Error al eliminar el producto: ' + ERROR_MESSAGE();
+  THROW;
+ END CATCH
+END;
+
+
+=== Creación 02_Ampliacion_rubrica.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9427989-03:00
+-- Ampliación propuesta para cubrir menciones de la rúbrica.
+-- INSTEAD OF reemplaza la operación; no es un trigger BEFORE.
+CREATE TRIGGER dbo.trg_Validar_Actualizacion ON dbo.Productos INSTEAD OF UPDATE
+AS
+BEGIN
+ SET NOCOUNT ON;
+ IF EXISTS(SELECT 1 FROM inserted WHERE Nombre IS NULL OR LEN(LTRIM(RTRIM(Nombre)))=0
+  OR Stock IS NULL OR Stock<0 OR Precio IS NULL OR Precio<0)
+  THROW 50005, 'Actualización rechazada: nombre, stock o precio inválidos.', 1;
+ UPDATE p SET Nombre=i.Nombre, Stock=i.Stock, Precio=i.Precio
+ FROM dbo.Productos p JOIN inserted i ON p.IdProducto=i.IdProducto;
+END;
+
+
+=== Creación 02_Ampliacion_rubrica.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9441649-03:00
+
+CREATE TRIGGER dbo.trg_Auditoria_ActualizarProducto ON dbo.Productos AFTER UPDATE
+AS
+BEGIN
+ SET NOCOUNT ON;
+ -- Condicional: no registrar una actualización sin cambios efectivos.
+ INSERT dbo.AuditoriaInventario(IdProducto,Accion)
+ SELECT i.IdProducto,'UPD' FROM inserted i JOIN deleted d ON i.IdProducto=d.IdProducto
+ WHERE i.Nombre<>d.Nombre OR i.Stock<>d.Stock OR i.Precio<>d.Precio;
+END;
+
+
+=== Creación 02_Ampliacion_rubrica.sql ===
+FECHA_REAL: 2026-10-08T16:39:18.9452109-03:00
+
+CREATE PROCEDURE dbo.sp_ConsultarInventarioCursor
+AS
+BEGIN
+ SET NOCOUNT ON;
+ DECLARE @Id INT,@Nombre NVARCHAR(100),@Stock INT;
+ -- Demostración académica de recorrido. Para listar inventario se prefiere SELECT.
+ DECLARE inventario CURSOR LOCAL FAST_FORWARD FOR
+ SELECT IdProducto,Nombre,Stock FROM dbo.Productos ORDER BY IdProducto;
+ BEGIN TRY
+  OPEN inventario;
+  FETCH NEXT FROM inventario INTO @Id,@Nombre,@Stock;
+  WHILE @@FETCH_STATUS=0
+  BEGIN
+   PRINT CONCAT('ID=',@Id,'; Nombre=',@Nombre,'; Stock=',@Stock);
+   FETCH NEXT FROM inventario INTO @Id,@Nombre,@Stock;
+  END;
+  CLOSE inventario;
+  DEALLOCATE inventario;
+ END TRY
+ BEGIN CATCH
+  IF CURSOR_STATUS('local','inventario')>=0 CLOSE inventario;
+  IF CURSOR_STATUS('local','inventario')>=-1 DEALLOCATE inventario;
+  THROW;
+ END CATCH
+END;
+
+
+=== E01 Antes alta ===
+FECHA_REAL: 2026-10-08T16:39:18.9464092-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+FILAS: 0
+
+=== E01 Alta; datos ficticios de prueba ===
+FECHA_REAL: 2026-10-08T16:39:18.9514306-03:00
+EXEC dbo.sp_AltaProducto N'Teclado de prueba',10,19990;
+MENSAJE: Producto insertado correctamente.
+
+=== E01 Después alta ===
+FECHA_REAL: 2026-10-08T16:39:18.9585292-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+1 | Teclado de prueba | 10 | 19990.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+FILAS: 1
+
+=== E02 Baja ID existente ===
+FECHA_REAL: 2026-10-08T16:39:18.9631713-03:00
+DECLARE @Id INT=(SELECT MIN(IdProducto) FROM dbo.Productos); EXEC dbo.sp_BajaProducto @Id;
+MENSAJE: Producto eliminado correctamente.
+
+=== E02 Después baja ===
+FECHA_REAL: 2026-10-08T16:39:18.9681036-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+FILAS: 2
+
+=== E03 ID inexistente y después ===
+FECHA_REAL: 2026-10-08T16:39:18.9687857-03:00
+SELECT * FROM dbo.Productos WHERE IdProducto=2147483647; EXEC dbo.sp_BajaProducto 2147483647; SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+MENSAJE: Producto no existe.
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+FILAS: 2
+
+=== E04 Triggers ===
+FECHA_REAL: 2026-10-08T16:39:18.9720104-03:00
+EXEC sp_helptrigger N'dbo.Productos';
+trigger_name | trigger_owner | isupdate | isdelete | isinsert | isafter | isinsteadof | trigger_schema
+trg_Auditoria_AltaProducto | dbo | 0 | 0 | 1 | 1 | 0 | dbo
+trg_Auditoria_BajaProducto | dbo | 0 | 1 | 0 | 1 | 0 | dbo
+trg_Validar_Actualizacion | dbo | 1 | 0 | 0 | 0 | 1 | dbo
+trg_Auditoria_ActualizarProducto | dbo | 1 | 0 | 0 | 1 | 0 | dbo
+FILAS: 4
+
+=== E05 Definición alta ===
+FECHA_REAL: 2026-10-08T16:39:18.9986412-03:00
+EXEC sp_helptext N'dbo.sp_AltaProducto';
+Text
+
+CREATE PROCEDURE dbo.sp_AltaProducto
+ @Nombre NVARCHAR(100), @Stock INT, @Precio DECIMAL(10,2)
+AS
+BEGIN
+ SET NOCOUNT ON;
+ BEGIN TRY
+  IF @Nombre IS NULL OR LEN(LTRIM(RTRIM(@Nombre)))=0
+   THROW 50001, 'El nombre no puede estar vacío.', 1;
+  IF @Stock IS 
+NULL OR @Stock < 0 THROW 50002, 'El stock debe ser no negativo.', 1;
+  IF @Precio IS NULL OR @Precio < 0 THROW 50003, 'El precio debe ser no negativo.', 1;
+  INSERT dbo.Productos(Nombre,Stock,Precio) VALUES(@Nombre,@Stock,@Precio);
+  PRINT 'Producto inser
+tado correctamente.';
+ END TRY
+ BEGIN CATCH
+  PRINT 'Error al insertar el producto: ' + ERROR_MESSAGE();
+  THROW;
+ END CATCH
+END;
+
+FILAS: 3
+
+=== E06 Definición baja ===
+FECHA_REAL: 2026-10-08T16:39:19.1056164-03:00
+EXEC sp_helptext N'dbo.sp_BajaProducto';
+Text
+
+CREATE PROCEDURE dbo.sp_BajaProducto @IdProducto INT
+AS
+BEGIN
+ SET NOCOUNT ON;
+ BEGIN TRY
+  IF @IdProducto IS NULL OR @IdProducto <= 0
+   THROW 50004, 'El identificador debe ser positivo.', 1;
+  -- DELETE y @@ROWCOUNT evitan separar la comprobación de la
+ operación.
+  DELETE dbo.Productos WHERE IdProducto=@IdProducto;
+  IF @@ROWCOUNT=0 PRINT 'Producto no existe.';
+  ELSE PRINT 'Producto eliminado correctamente.';
+ END TRY
+ BEGIN CATCH
+  PRINT 'Error al eliminar el producto: ' + ERROR_MESSAGE();
+  THROW;
+ 
+END CATCH
+END;
+
+FILAS: 3
+
+=== E07 CATCH alta ===
+FECHA_REAL: 2026-10-08T16:39:19.1068900-03:00
+EXEC dbo.sp_AltaProducto N'Inválido',-1,10;
+MENSAJE: Error al insertar el producto: El stock debe ser no negativo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El stock debe ser no negativo."
+NUMERO_ERROR_SQL: 50002
+
+=== E07 CATCH baja ===
+FECHA_REAL: 2026-10-08T16:39:19.1224721-03:00
+EXEC dbo.sp_BajaProducto -1;
+MENSAJE: Error al eliminar el producto: El identificador debe ser positivo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El identificador debe ser positivo."
+NUMERO_ERROR_SQL: 50004
+
+=== E07 Estado sin cambios ===
+FECHA_REAL: 2026-10-08T16:39:19.1236371-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+FILAS: 2
+
+=== E08 Alta múltiple ===
+FECHA_REAL: 2026-10-08T16:39:19.1243335-03:00
+INSERT dbo.Productos(Nombre,Stock,Precio) VALUES(N'Monitor prueba',3,100),(N'Mouse prueba',5,20); SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+2 | Monitor prueba | 3 | 100.00
+3 | Mouse prueba | 5 | 20.00
+FILAS: 2
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+FILAS: 4
+
+=== E10 Cursor ===
+FECHA_REAL: 2026-10-08T16:39:19.1287763-03:00
+EXEC dbo.sp_ConsultarInventarioCursor;
+MENSAJE: ID=2; Nombre=Monitor prueba; Stock=3
+MENSAJE: ID=3; Nombre=Mouse prueba; Stock=5
+
+=== E10 Actualización válida ===
+FECHA_REAL: 2026-10-08T16:39:19.1301546-03:00
+UPDATE dbo.Productos SET Stock=Stock+1; SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+2 | Monitor prueba | 4 | 100.00
+3 | Mouse prueba | 6 | 20.00
+FILAS: 2
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+FILAS: 6
+
+=== E10 Actualización sin cambios ===
+FECHA_REAL: 2026-10-08T16:39:19.1398629-03:00
+UPDATE dbo.Productos SET Stock=Stock; SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+2 | Monitor prueba | 4 | 100.00
+3 | Mouse prueba | 6 | 20.00
+FILAS: 2
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+FILAS: 6
+
+=== E09 Actualización inválida ===
+FECHA_REAL: 2026-10-08T16:39:19.1427853-03:00
+UPDATE dbo.Productos SET Stock=-1;
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "Actualización rechazada: nombre, stock o precio inválidos."
+NUMERO_ERROR_SQL: 50005
+
+=== E09 Estado tras rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1443490-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+2 | Monitor prueba | 4 | 100.00
+3 | Mouse prueba | 6 | 20.00
+FILAS: 2
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+FILAS: 6
+
+=== E08 Baja múltiple ===
+FECHA_REAL: 2026-10-08T16:39:19.1453631-03:00
+DELETE dbo.Productos; SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E11 Cursor vacío ===
+FECHA_REAL: 2026-10-08T16:39:19.1475699-03:00
+EXEC dbo.sp_ConsultarInventarioCursor; SELECT COUNT(*) AS Productos FROM dbo.Productos;
+Productos
+0
+FILAS: 1
+
+=== E12 Nombre nulo: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1483784-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Nombre nulo: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1493138-03:00
+EXEC dbo.sp_AltaProducto NULL,1,10;
+MENSAJE: Error al insertar el producto: El nombre no puede estar vacío.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El nombre no puede estar vacío."
+NUMERO_ERROR_SQL: 50001
+
+=== E12 Nombre nulo: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1500827-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Nombre vacío: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1511190-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Nombre vacío: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1521358-03:00
+EXEC dbo.sp_AltaProducto N'',1,10;
+MENSAJE: Error al insertar el producto: El nombre no puede estar vacío.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El nombre no puede estar vacío."
+NUMERO_ERROR_SQL: 50001
+
+=== E12 Nombre vacío: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1529440-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Nombre solo espacios: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1539842-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Nombre solo espacios: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1549945-03:00
+EXEC dbo.sp_AltaProducto N'   ',1,10;
+MENSAJE: Error al insertar el producto: El nombre no puede estar vacío.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El nombre no puede estar vacío."
+NUMERO_ERROR_SQL: 50001
+
+=== E12 Nombre solo espacios: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1558931-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Stock nulo: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1568788-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Stock nulo: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1578216-03:00
+EXEC dbo.sp_AltaProducto N'Prueba',NULL,10;
+MENSAJE: Error al insertar el producto: El stock debe ser no negativo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El stock debe ser no negativo."
+NUMERO_ERROR_SQL: 50002
+
+=== E12 Stock nulo: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1585615-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Precio nulo: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1595800-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Precio nulo: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1605596-03:00
+EXEC dbo.sp_AltaProducto N'Prueba',1,NULL;
+MENSAJE: Error al insertar el producto: El precio debe ser no negativo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El precio debe ser no negativo."
+NUMERO_ERROR_SQL: 50003
+
+=== E12 Precio nulo: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1613072-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Precio negativo: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1622737-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 Precio negativo: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1632905-03:00
+EXEC dbo.sp_AltaProducto N'Prueba',1,-10;
+MENSAJE: Error al insertar el producto: El precio debe ser no negativo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El precio debe ser no negativo."
+NUMERO_ERROR_SQL: 50003
+
+=== E12 Precio negativo: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1640681-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 ID nulo: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1650261-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 ID nulo: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1660154-03:00
+EXEC dbo.sp_BajaProducto NULL;
+MENSAJE: Error al eliminar el producto: El identificador debe ser positivo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El identificador debe ser positivo."
+NUMERO_ERROR_SQL: 50004
+
+=== E12 ID nulo: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1667316-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 ID cero: antes ===
+FECHA_REAL: 2026-10-08T16:39:19.1677844-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E12 ID cero: rechazo ===
+FECHA_REAL: 2026-10-08T16:39:19.1687667-03:00
+EXEC dbo.sp_BajaProducto 0;
+MENSAJE: Error al eliminar el producto: El identificador debe ser positivo.
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "El identificador debe ser positivo."
+NUMERO_ERROR_SQL: 50004
+
+=== E12 ID cero: después ===
+FECHA_REAL: 2026-10-08T16:39:19.1694653-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+FILAS: 8
+
+=== E13 Límites válidos y restauración por rollback ===
+FECHA_REAL: 2026-10-08T16:39:19.1704178-03:00
+BEGIN TRAN; EXEC dbo.sp_AltaProducto N'Producto límite',0,0; SELECT * FROM dbo.Productos; SELECT * FROM dbo.AuditoriaInventario; ROLLBACK; SELECT COUNT(*) AS Productos_tras_rollback FROM dbo.Productos;
+MENSAJE: Producto insertado correctamente.
+IdProducto | Nombre | Stock | Precio
+4 | Producto límite | 0 | 0.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+9 | 4 | INS | 10/08/2026 16:39:19
+FILAS: 9
+Productos_tras_rollback
+0
+FILAS: 1
+
+=== E14 Validaciones UPDATE adicionales: estado inicial confirmado ===
+FECHA_REAL: 2026-10-08T16:39:19.1732075-03:00
+EXEC dbo.sp_AltaProducto N'Producto validación',1,10; SELECT * FROM dbo.Productos; SELECT * FROM dbo.AuditoriaInventario;
+MENSAJE: Producto insertado correctamente.
+IdProducto | Nombre | Stock | Precio
+5 | Producto validación | 1 | 10.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+FILAS: 9
+
+=== E14 Nombre nulo ===
+FECHA_REAL: 2026-10-08T16:39:19.1752898-03:00
+UPDATE dbo.Productos SET Nombre=NULL;
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "Actualización rechazada: nombre, stock o precio inválidos."
+NUMERO_ERROR_SQL: 50005
+
+=== E14 Nombre nulo: estado conservado ===
+FECHA_REAL: 2026-10-08T16:39:19.1768582-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+5 | Producto validación | 1 | 10.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+FILAS: 9
+
+=== E14 Nombre vacío ===
+FECHA_REAL: 2026-10-08T16:39:19.1779537-03:00
+UPDATE dbo.Productos SET Nombre=N'';
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "Actualización rechazada: nombre, stock o precio inválidos."
+NUMERO_ERROR_SQL: 50005
+
+=== E14 Nombre vacío: estado conservado ===
+FECHA_REAL: 2026-10-08T16:39:19.1795257-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+5 | Producto validación | 1 | 10.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+FILAS: 9
+
+=== E14 Stock nulo ===
+FECHA_REAL: 2026-10-08T16:39:19.1806192-03:00
+UPDATE dbo.Productos SET Stock=NULL;
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "Actualización rechazada: nombre, stock o precio inválidos."
+NUMERO_ERROR_SQL: 50005
+
+=== E14 Stock nulo: estado conservado ===
+FECHA_REAL: 2026-10-08T16:39:19.1820885-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+5 | Producto validación | 1 | 10.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+FILAS: 9
+
+=== E14 Precio nulo ===
+FECHA_REAL: 2026-10-08T16:39:19.1832048-03:00
+UPDATE dbo.Productos SET Precio=NULL;
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "Actualización rechazada: nombre, stock o precio inválidos."
+NUMERO_ERROR_SQL: 50005
+
+=== E14 Precio nulo: estado conservado ===
+FECHA_REAL: 2026-10-08T16:39:19.1846663-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+5 | Producto validación | 1 | 10.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+FILAS: 9
+
+=== E14 Precio negativo ===
+FECHA_REAL: 2026-10-08T16:39:19.1857916-03:00
+UPDATE dbo.Productos SET Precio=-1;
+ERROR: Exception calling "ExecuteReader" with "0" argument(s): "Actualización rechazada: nombre, stock o precio inválidos."
+NUMERO_ERROR_SQL: 50005
+
+=== E14 Precio negativo: estado conservado ===
+FECHA_REAL: 2026-10-08T16:39:19.1874347-03:00
+SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+5 | Producto validación | 1 | 10.00
+FILAS: 1
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+FILAS: 9
+
+=== E14 Limpieza de producto de prueba ===
+FECHA_REAL: 2026-10-08T16:39:19.1890322-03:00
+DELETE dbo.Productos; SELECT * FROM dbo.Productos ORDER BY IdProducto; SELECT * FROM dbo.AuditoriaInventario ORDER BY IdAuditoria;
+IdProducto | Nombre | Stock | Precio
+FILAS: 0
+IdAuditoria | IdProducto | Accion | Fecha
+1 | 1 | INS | 10/08/2026 16:39:18
+2 | 1 | DEL | 10/08/2026 16:39:18
+3 | 3 | INS | 10/08/2026 16:39:19
+4 | 2 | INS | 10/08/2026 16:39:19
+5 | 3 | UPD | 10/08/2026 16:39:19
+6 | 2 | UPD | 10/08/2026 16:39:19
+7 | 3 | DEL | 10/08/2026 16:39:19
+8 | 2 | DEL | 10/08/2026 16:39:19
+10 | 5 | INS | 10/08/2026 16:39:19
+11 | 5 | DEL | 10/08/2026 16:39:19
+FILAS: 10
+
+=== Comprobación final automática ===
+FECHA_REAL: 2026-10-08T16:39:19.1903674-03:00
+IF (SELECT COUNT(*) FROM dbo.Productos)<>0 THROW 50100,'Productos final inesperado',1; IF (SELECT COUNT(*) FROM dbo.AuditoriaInventario WHERE Accion='INS')<>4 THROW 50101,'INS inesperado',1; IF (SELECT COUNT(*) FROM dbo.AuditoriaInventario WHERE Accion='DEL')<>4 THROW 50102,'DEL inesperado',1; IF (SELECT COUNT(*) FROM dbo.AuditoriaInventario WHERE Accion='UPD')<>2 THROW 50103,'UPD inesperado',1; SELECT 'Verificaciones superadas' AS Resultado;
+Resultado
+Verificaciones superadas
+FILAS: 1
+
