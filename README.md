@@ -42,7 +42,7 @@ Se probaron altas y bajas válidas, baja inexistente, valores nulos, vacíos y n
 
 El cierre de la serie ampliada confirmó **0 productos, 4 INS, 4 DEL y 2 UPD**. Una prueba de stock y precio cero fue revertida con ROLLBACK y no integra ese recuento. Los datos son ficticios; la ejecución y los resultados son reales.
 
-Las imágenes son capturas de un visor local de registros obtenidos mediante .NET SqlClient; no son capturas de la interfaz de SQL Server Management Studio. Hay 35 conjuntos de evidencia, paginados en 57 capturas, además de una vista general. El informe incorpora una selección para facilitar la lectura.
+Las imágenes son capturas de un visor local de registros obtenidos mediante .NET SqlClient; no son capturas de la interfaz de SQL Server Management Studio. Hay 35 conjuntos de evidencia, paginados en 57 capturas, además de una vista general. El informe reducido tiene 18 páginas e incorpora siete figuras principales, en ocho capturas, para facilitar la lectura. El código completo y todas las evidencias permanecen en este repositorio.
 
 No se probaron todas las condiciones de concurrencia o fallos de infraestructura. La limpieza de recursos en el CATCH del cursor está implementada, pero no se provocó un fallo dentro de su recorrido.
 
@@ -51,3 +51,5 @@ No se probaron todas las condiciones de concurrencia o fallos de infraestructura
 El informe cita las orientaciones de la actividad y la documentación de Microsoft Learn sobre CREATE TRIGGER, TRY...CATCH y DECLARE CURSOR. Los originales de las instrucciones y de la plantilla se conservan en el proyecto local.
 
 Se utilizó Codex para organizar requisitos, preparar código, ejecutar pruebas locales, capturar los resultados y apoyar la redacción y revisión. Esta asistencia también se declara en el informe. La autoría académica corresponde a Blas Pinto.
+
+Como referencia para una coordinación futura, [claude-work-mcp](https://github.com/blaspinto5/claude-work-mcp) reúne herramientas MCP de archivos, notas compartidas Codex–Claude, APIs configuradas y comandos permitidos. Se propone que Claude planifique y analice errores, mientras Codex ejecute. No se registró uso de Claude o de ese servidor durante las pruebas documentadas.
